@@ -9,6 +9,17 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <NavigationView 
+            Name="HomeAeroNavigation" 
+            PaneDisplayMode="LeftCompact"
+            SelectionChanged="SelectionChanged"
+        >
+            <NavigationView.MenuItems>
+                <NavigationViewItem Icon="Home" Content="Home" Tag="Home"/>
+                <NavigationViewItem Icon="Account" Content="Account" Tag="Account" />
+            </NavigationView.MenuItems>
+            <Frame x:Name="ContentFrame" />
+        </NavigationView>
 
     </Grid>
 </Page>
