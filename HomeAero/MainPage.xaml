@@ -13,10 +13,14 @@
             Name="HomeAeroNavigation" 
             PaneDisplayMode="LeftCompact"
             SelectionChanged="SelectionChanged"
+            IsSettingsVisible="False"
+            IsBackButtonVisible="Collapsed"
+            IsBackEnabled="False"
         >
             <NavigationView.MenuItems>
                 <NavigationViewItem Icon="Home" Content="Home" Tag="Home"/>
                 <NavigationViewItem Icon="Account" Content="Account" Tag="Account" />
+                <NavigationViewItem Icon="Setting" Content="Settings" Tag="Settings" />
             </NavigationView.MenuItems>
             <Frame x:Name="ContentFrame" />
         </NavigationView>

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -26,6 +27,7 @@ namespace HomeAero
     {
         // List of ValueTuple holding the Navigation Tag and the relative Navigation Page
         private readonly List<(string Tag, Type Page)> _pages;
+        private bool canNavigate = true;
 
         public MainPage()
         {
@@ -39,24 +41,39 @@ namespace HomeAero
                 ("Settings", typeof(SettingsPage)),
             };
 
-            // TODO: Load device information
-            // TODO: Check if initial setup was completed
+            // If settings contains a device name and account email, set the page to 
+            // Home. Otherwise, set the page to Settings and disable navigation
+            (string Tag, Type Page) initialPage = ("Home", typeof(HomePage));
+            var appSettings = (App.Current as App).settings;
 
-            // Set the home page
-            var initialPage = _pages.First(p => p.Tag.Equals("Home"));
+            if(
+                appSettings.Values["DeviceName"] != null &&
+                appSettings.Values["UserEmail"] != null
+            )
+                initialPage = _pages.First(p => p.Tag.Equals("Home"));
+
+            else
+            {
+                initialPage = _pages.First(p => p.Tag.Equals("Settings"));
+                canNavigate = false;
+            }
+
             ContentFrame.Navigate(initialPage.Page, null);
         }
 
         private void SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            var transitionInfo = args.RecommendedNavigationTransitionInfo;
-
-            if (args.IsSettingsSelected == true)
-                Navigate("Settings", transitionInfo);
-            else
+            if(canNavigate == true)
             {
-                var navigationTag = args.SelectedItemContainer.Tag.ToString();
-                Navigate(navigationTag, transitionInfo);
+                var transitionInfo = args.RecommendedNavigationTransitionInfo;
+
+                if (args.IsSettingsSelected == true)
+                    Navigate("Settings", transitionInfo);
+                else
+                {
+                    var navigationTag = args.SelectedItemContainer.Tag.ToString();
+                    Navigate(navigationTag, transitionInfo);
+                }
             }
         }
 
