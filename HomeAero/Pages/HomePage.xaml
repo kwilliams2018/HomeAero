@@ -33,7 +33,7 @@
 
         <TextBlock 
             x:Name="DateBlock" 
-            Text="Dec 5, 4:35 AM" 
+            Text="" 
             Grid.Row="0" 
             Grid.Column="1" 
             Grid.ColumnSpan="3" 
@@ -78,6 +78,7 @@
                     FontSize="12"
                 />
                 <TextBlock 
+                    x:Name="DeviceName"
                     Text="Device Name: HomeAero"
                     Grid.Row="1"
                     VerticalAlignment="Center"

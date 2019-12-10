@@ -24,6 +24,8 @@ namespace HomeAero
     sealed partial class App : Application
     {
         public ApplicationDataContainer settings { get; set; }
+        DispatcherTimer timer; // Used for running the HomeAero
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -32,6 +34,20 @@ namespace HomeAero
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+
+            InitializeTimer();
+        }
+
+        private void InitializeTimer()
+        {
+            timer = new DispatcherTimer();
+            timer.Tick += TimerTick;
+            timer.Interval = new TimeSpan(0, 0, 1);
+            timer.Start();
+        }
+
+        private void TimerTick(object sender, object e)
+        {
         }
 
         /// <summary>

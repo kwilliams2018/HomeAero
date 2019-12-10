@@ -63,6 +63,7 @@
             HorizontalAlignment="Center"
             Content="Save"
             Style="{StaticResource AccentButtonStyle}"
+            Click="HandleSave"
         />
     </Grid>
 </Page>

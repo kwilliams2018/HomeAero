@@ -27,7 +27,7 @@ namespace HomeAero
     {
         // List of ValueTuple holding the Navigation Tag and the relative Navigation Page
         private readonly List<(string Tag, Type Page)> _pages;
-        private bool canNavigate = true;
+        ApplicationDataContainer appSettings;
 
         public MainPage()
         {
@@ -44,18 +44,20 @@ namespace HomeAero
             // If settings contains a device name and account email, set the page to 
             // Home. Otherwise, set the page to Settings and disable navigation
             (string Tag, Type Page) initialPage = ("Home", typeof(HomePage));
-            var appSettings = (App.Current as App).settings;
+            appSettings = (App.Current as App).settings;
 
             if(
-                appSettings.Values["DeviceName"] != null &&
-                appSettings.Values["UserEmail"] != null
+                appSettings.Values["DeviceName"] == null &&
+                appSettings.Values["UserEmail"] == null
             )
-                initialPage = _pages.First(p => p.Tag.Equals("Home"));
-
-            else
             {
                 initialPage = _pages.First(p => p.Tag.Equals("Settings"));
-                canNavigate = false;
+                appSettings.Values["CanNavigate"] = false;
+            }
+            else
+            {
+                initialPage = _pages.First(p => p.Tag.Equals("Home"));
+                appSettings.Values["CanNavigate"] = true;
             }
 
             ContentFrame.Navigate(initialPage.Page, null);
@@ -63,7 +65,7 @@ namespace HomeAero
 
         private void SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            if(canNavigate == true)
+            if((bool)appSettings.Values["CanNavigate"] == true)
             {
                 var transitionInfo = args.RecommendedNavigationTransitionInfo;
 
