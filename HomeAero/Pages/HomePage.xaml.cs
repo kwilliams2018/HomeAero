@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HomeAero.Config;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,35 +24,51 @@ namespace HomeAero.Pages
     /// </summary>
     public sealed partial class HomePage : Page
     {
-        ApplicationDataContainer appSettings;
-        DispatcherTimer timer; // Used for updating the time
+        ApplicationDataContainer Settings;
+        HomeAeroConfiguration HomeAero;
+        DispatcherTimer Timer; // Used for updating the time
 
         public HomePage()
         {
             this.InitializeComponent();
             InitializeTimer();
 
-            appSettings = (App.Current as App).settings;
+            Settings = (App.Current as App).Settings;
+            HomeAero = (App.Current as App).HomeAero;
 
-            var deviceName = appSettings.Values["DeviceName"] != null
-                ? appSettings.Values["DeviceName"].ToString()
+            var deviceName = Settings.Values["DeviceName"] != null
+                ? Settings.Values["DeviceName"].ToString()
                 : String.Empty;
 
             DeviceName.Text = $"Device Name: {deviceName}";
+
+            UpdateSensorText();
         }
 
         private void InitializeTimer()
         {
-            timer = new DispatcherTimer();
-            timer.Tick += TimerTick;
-            timer.Interval = new TimeSpan(0, 0, 1);
-            timer.Start();
+            Timer = new DispatcherTimer();
+            Timer.Tick += TimerTick;
+            Timer.Interval = new TimeSpan(0, 0, 1);
+            Timer.Start();
         }
 
         private void TimerTick(object sender, object e)
         {
             var formattedTime = DateTime.Now.ToString("MMM d, h:mm tt");
             DateBlock.Text = formattedTime;
+
+            UpdateSensorText();
+        }
+
+        private void UpdateSensorText()
+        {
+            var sensorReadings = HomeAero.GetSensorData();
+
+            RootTemp.Text = $"Root Temperature: {sensorReadings.RootTemperature}F";
+            RootHumid.Text = $"Root Humidity: {sensorReadings.RootHumidity}%";
+            PlantTemp.Text = $"Plant Temperature: {sensorReadings.PlantTemperature}F";
+            PlantHumid.Text = $"Plant Humidity: {sensorReadings.PlantHumidity}%";
         }
     }
 }

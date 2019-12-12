@@ -44,7 +44,7 @@ namespace HomeAero
             // If settings contains a device name and account email, set the page to 
             // Home. Otherwise, set the page to Settings and disable navigation
             (string Tag, Type Page) initialPage = ("Home", typeof(HomePage));
-            appSettings = (App.Current as App).settings;
+            appSettings = (App.Current as App).Settings;
 
             if(
                 appSettings.Values["DeviceName"] == null &&

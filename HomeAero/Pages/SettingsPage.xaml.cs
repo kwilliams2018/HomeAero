@@ -28,7 +28,7 @@ namespace HomeAero.Pages
         public SettingsPage()
         {
             this.InitializeComponent();
-            appSettings = (App.Current as App).settings;
+            appSettings = (App.Current as App).Settings;
 
             var deviceName = appSettings.Values["DeviceName"] != null
                 ? appSettings.Values["DeviceName"].ToString()

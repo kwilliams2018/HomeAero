@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HomeAero.Config;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,8 +24,10 @@ namespace HomeAero
     /// </summary>
     sealed partial class App : Application
     {
-        public ApplicationDataContainer settings { get; set; }
-        DispatcherTimer timer; // Used for running the HomeAero
+        public ApplicationDataContainer Settings { get; set; }
+        public HomeAeroConfiguration HomeAero { get; set; }
+        DispatcherTimer Timer; // Used for running the HomeAero
+        
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -35,15 +38,17 @@ namespace HomeAero
             this.InitializeComponent();
             this.Suspending += OnSuspending;
 
+            HomeAero = new HomeAeroConfiguration();
+
             InitializeTimer();
         }
 
         private void InitializeTimer()
         {
-            timer = new DispatcherTimer();
-            timer.Tick += TimerTick;
-            timer.Interval = new TimeSpan(0, 0, 1);
-            timer.Start();
+            Timer = new DispatcherTimer();
+            Timer.Tick += TimerTick;
+            Timer.Interval = new TimeSpan(0, 0, 1);
+            Timer.Start();
         }
 
         private void TimerTick(object sender, object e)
@@ -58,7 +63,7 @@ namespace HomeAero
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
             // Get the settings and make it available for all pages
-            settings = ApplicationData.Current.LocalSettings;
+            Settings = ApplicationData.Current.LocalSettings;
 
             Frame rootFrame = Window.Current.Content as Frame;
 
