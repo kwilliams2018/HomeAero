@@ -26,7 +26,11 @@ namespace HomeAero
     {
         public ApplicationDataContainer Settings { get; set; }
         public HomeAeroConfiguration HomeAero { get; set; }
-        DispatcherTimer Timer; // Used for running the HomeAero
+        // Used for running the HomeAero
+        DispatcherTimer Timer; 
+        private DateTimeOffset _currentTime;
+        private DateTimeOffset _sensorTime;
+        private DateTimeOffset _mistingStartTime;
         
 
         /// <summary>
@@ -53,6 +57,34 @@ namespace HomeAero
 
         private void TimerTick(object sender, object e)
         {
+            try
+            {
+                // Get values from settings
+                double.TryParse(Settings.Values["MistInterval"].ToString(), out var mistInterval);
+                double.TryParse(Settings.Values["MistDuration"].ToString(), out var mistDuration);
+
+                if (mistInterval > 0 && mistDuration > 0)
+                {
+                    _currentTime = DateTimeOffset.Now;
+
+                    var durationSinceStart = _currentTime - _mistingStartTime;
+                    var nextStartTime = _mistingStartTime.AddSeconds(mistInterval + mistDuration);
+
+                    if (durationSinceStart.TotalSeconds > mistDuration)
+                    {
+                        // TODO: Stop Misting
+                    }
+                    else if (_currentTime > nextStartTime)
+                    {
+                        _mistingStartTime = DateTimeOffset.Now;
+                        // TODO: Start Misting
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                // TODO: Add error handling - settings not valid
+            }
         }
 
         /// <summary>

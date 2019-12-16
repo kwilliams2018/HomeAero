@@ -38,8 +38,18 @@ namespace HomeAero.Pages
                 ? appSettings.Values["UserEmail"].ToString()
                 : String.Empty;
 
+            var mistInterval = appSettings.Values["MistInterval"] != null
+                ? appSettings.Values["MistInterval"].ToString()
+                : String.Empty;
+
+            var mistDuration = appSettings.Values["MistDuration"] != null
+                ? appSettings.Values["MistDuration"].ToString()
+                : String.Empty;
+
             DeviceNameText.Text = deviceName;
             EmailText.Text = userEmail;
+            MistIntervalText.Text = mistInterval;
+            MistDurationText.Text = mistDuration;
         }
 
         private void HandleSave(object sender, RoutedEventArgs e)
@@ -47,8 +57,15 @@ namespace HomeAero.Pages
             // TODO: Display saving notification
             var deviceName = DeviceNameText.Text;
             var userEmail = EmailText.Text;
+            double.TryParse(MistIntervalText.Text, out var mistInterval);
+            double.TryParse(MistDurationText.Text, out var mistDuration);
 
-            if(deviceName == String.Empty || userEmail == String.Empty)
+            if (
+                deviceName == String.Empty || 
+                userEmail == String.Empty ||
+                mistInterval == 0 ||
+                mistDuration == 0
+            )
             {
                 // TODO: Display error message
                 return;
@@ -56,6 +73,8 @@ namespace HomeAero.Pages
 
             appSettings.Values["DeviceName"] = deviceName;
             appSettings.Values["UserEmail"] = userEmail;
+            appSettings.Values["MistInterval"] = mistInterval;
+            appSettings.Values["MistDuration"] = mistDuration;
             appSettings.Values["CanNavigate"] = true;
         }
     }
