@@ -62,22 +62,33 @@ namespace HomeAero
                 // Get values from settings
                 double.TryParse(Settings.Values["MistInterval"].ToString(), out var mistInterval);
                 double.TryParse(Settings.Values["MistDuration"].ToString(), out var mistDuration);
+                double.TryParse(Settings.Values["SensorInterval"].ToString(), out var sensorInterval);
+
+                _currentTime = DateTimeOffset.Now;
 
                 if (mistInterval > 0 && mistDuration > 0)
                 {
-                    _currentTime = DateTimeOffset.Now;
-
                     var durationSinceStart = _currentTime - _mistingStartTime;
                     var nextStartTime = _mistingStartTime.AddSeconds(mistInterval + mistDuration);
 
                     if (durationSinceStart.TotalSeconds > mistDuration)
                     {
-                        // TODO: Stop Misting
+                        HomeAero.EndMisting();
                     }
                     else if (_currentTime > nextStartTime)
                     {
                         _mistingStartTime = DateTimeOffset.Now;
-                        // TODO: Start Misting
+                        HomeAero.BeginMisting();
+                    }
+                }
+
+                if(sensorInterval > 0)
+                {
+                    var durationSinceSensorReading = _currentTime - _sensorTime;
+                    if (durationSinceSensorReading.TotalSeconds > sensorInterval)
+                    {
+                        _sensorTime = _currentTime;
+                        HomeAero.TakeSensorReading();
                     }
                 }
             }

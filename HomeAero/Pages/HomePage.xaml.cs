@@ -27,6 +27,7 @@ namespace HomeAero.Pages
         ApplicationDataContainer Settings;
         HomeAeroConfiguration HomeAero;
         DispatcherTimer Timer; // Used for updating the time
+        private DateTimeOffset _lastSensorUpdate;
 
         public HomePage()
         {
@@ -55,10 +56,15 @@ namespace HomeAero.Pages
 
         private void TimerTick(object sender, object e)
         {
-            var formattedTime = DateTime.Now.ToString("MMM d, h:mm tt");
+            var now = DateTimeOffset.Now;
+            var formattedTime = now.ToString("MMM d, h:mm tt");
             DateBlock.Text = formattedTime;
 
-            UpdateSensorText();
+            if(now - _lastSensorUpdate > TimeSpan.FromMinutes(1))
+            {
+                _lastSensorUpdate = now;
+                UpdateSensorText();
+            }
         }
 
         private void UpdateSensorText()

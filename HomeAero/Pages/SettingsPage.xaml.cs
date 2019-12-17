@@ -46,10 +46,15 @@ namespace HomeAero.Pages
                 ? appSettings.Values["MistDuration"].ToString()
                 : String.Empty;
 
+            var sensorInterval = appSettings.Values["SensorInterval"] != null
+                ? appSettings.Values["SensorInterval"].ToString()
+                : String.Empty;
+
             DeviceNameText.Text = deviceName;
             EmailText.Text = userEmail;
             MistIntervalText.Text = mistInterval;
             MistDurationText.Text = mistDuration;
+            SensorIntervalText.Text = sensorInterval;
         }
 
         private void HandleSave(object sender, RoutedEventArgs e)
@@ -59,12 +64,14 @@ namespace HomeAero.Pages
             var userEmail = EmailText.Text;
             double.TryParse(MistIntervalText.Text, out var mistInterval);
             double.TryParse(MistDurationText.Text, out var mistDuration);
+            double.TryParse(SensorIntervalText.Text, out var sensorInterval);
 
             if (
                 deviceName == String.Empty || 
                 userEmail == String.Empty ||
                 mistInterval == 0 ||
-                mistDuration == 0
+                mistDuration == 0 ||
+                sensorInterval == 0
             )
             {
                 // TODO: Display error message
@@ -75,6 +82,7 @@ namespace HomeAero.Pages
             appSettings.Values["UserEmail"] = userEmail;
             appSettings.Values["MistInterval"] = mistInterval;
             appSettings.Values["MistDuration"] = mistDuration;
+            appSettings.Values["SensorInterval"] = sensorInterval;
             appSettings.Values["CanNavigate"] = true;
         }
     }

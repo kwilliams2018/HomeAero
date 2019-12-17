@@ -90,6 +90,23 @@
             PlaceholderText="Seconds"
         />
 
+        <TextBlock
+            Grid.Row="2"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            Name="SensorIntervalLabel"
+            Text="Sensor Interval:"
+        />
+        <TextBox
+            Grid.Row="2"
+            Grid.Column="1"
+            VerticalAlignment="Center"
+            Margin="10 20"
+            Name="SensorIntervalText"
+            PlaceholderText="Seconds"
+        />
+        
         <Button
             Grid.Row="5"
             Grid.Column="3"

@@ -50,7 +50,8 @@ namespace HomeAero
                 appSettings.Values["DeviceName"] == null ||
                 appSettings.Values["UserEmail"] == null ||
                 appSettings.Values["MistInterval"] == null ||
-                appSettings.Values["MistDuration"] == null
+                appSettings.Values["MistDuration"] == null ||
+                appSettings.Values["SensorInterval"] == null
             )
             {
                 initialPage = _pages.First(p => p.Tag.Equals("Settings"));

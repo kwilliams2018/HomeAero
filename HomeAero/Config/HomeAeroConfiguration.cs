@@ -48,26 +48,45 @@ namespace HomeAero.Config
 
         public async void TakeSensorReading()
         {
-            List<Task<(string, double, double)>> sensorReadings = new List<Task<(string, double, double)>>
+            if(_rootDht != null && _plantDht != null)
             {
-                ReadDht("root", _rootDht),
-                ReadDht("plant", _plantDht)
-            };
+                try
+                {
+                    List<Task<(string, double, double)>> sensorReadings = new List<Task<(string, double, double)>>
+                    {
+                        ReadDht("root", _rootDht),
+                        ReadDht("plant", _plantDht)
+                    };
 
-            await Task.WhenAll(sensorReadings);
+                    await Task.WhenAll(sensorReadings);
 
-            foreach(var reading in sensorReadings)
+                    foreach (var reading in sensorReadings)
+                    {
+                        if (reading.Result.Item1 == "root")
+                        {
+                            _rootTemp = reading.Result.Item2;
+                            _rootHumid = reading.Result.Item3;
+                        }
+                        else
+                        {
+                            _plantTemp = reading.Result.Item2;
+                            _plantHumid = reading.Result.Item3;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // TODO: Add error handling - controller didn't initialize
+                }
+            }
+            // Temp until hardware setup - set random values
+            else
             {
-                if(reading.Result.Item1 == "root")
-                {
-                    _rootTemp = reading.Result.Item2;
-                    _rootHumid = reading.Result.Item3;
-                }
-                else
-                {
-                    _plantTemp = reading.Result.Item2;
-                    _plantHumid = reading.Result.Item3;
-                }
+                var rand = new Random();
+                _rootTemp = rand.Next(60, 100);
+                _rootHumid = rand.Next(80, 100);
+                _plantTemp = rand.Next(60, 80);
+                _plantHumid = rand.Next(80, 90);
             }
         }
 
@@ -80,6 +99,16 @@ namespace HomeAero.Config
                 PlantTemperature = _plantTemp,
                 PlantHumidity = _plantHumid
             };
+        }
+
+        public void BeginMisting()
+        {
+
+        }
+
+        public void EndMisting()
+        {
+
         }
 
         private async Task<(string identifier, double temperature, double humidity)> ReadDht(string identifier, IDht device)
