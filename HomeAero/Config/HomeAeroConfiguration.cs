@@ -16,8 +16,12 @@ namespace HomeAero.Config
         private GpioController _controller;
         private const int ROOT_DHT = 4;
         private const int PLANT_DHT = 5;
+        private const int MOTOR_ONE = 12;
+        private const int MOTOR_TWO = 13;
         private GpioPin _rootDhtPin;
         private GpioPin _plantDhtPin;
+        private GpioPin _motorOnePin;
+        private GpioPin _motorTwoPin;
         private IDht _rootDht;
         private IDht _plantDht;
 
@@ -38,6 +42,14 @@ namespace HomeAero.Config
 
                 _rootDht = new Dht11(_rootDhtPin, GpioPinDriveMode.Input);
                 _plantDht = new Dht11(_plantDhtPin, GpioPinDriveMode.Input);
+
+                _motorOnePin = _controller.OpenPin(MOTOR_ONE);
+                _motorOnePin.SetDriveMode(GpioPinDriveMode.Output);
+                _motorOnePin.Write(GpioPinValue.Low);
+
+                _motorTwoPin = _controller.OpenPin(MOTOR_TWO);
+                _motorTwoPin.SetDriveMode(GpioPinDriveMode.Output);
+                _motorTwoPin.Write(GpioPinValue.Low);
             }
 
             _rootTemp = 0;
@@ -103,12 +115,20 @@ namespace HomeAero.Config
 
         public void BeginMisting()
         {
-
+            if(_motorOnePin != null && _motorTwoPin != null)
+            {
+                _motorOnePin.Write(GpioPinValue.High);
+                _motorTwoPin.Write(GpioPinValue.High);
+            }
         }
 
         public void EndMisting()
         {
-
+            if(_motorOnePin != null && _motorTwoPin != null)
+            {
+                _motorOnePin.Write(GpioPinValue.Low);
+                _motorTwoPin.Write(GpioPinValue.Low);
+            }
         }
 
         private async Task<(string identifier, double temperature, double humidity)> ReadDht(string identifier, IDht device)

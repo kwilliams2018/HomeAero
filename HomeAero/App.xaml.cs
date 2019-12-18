@@ -27,10 +27,11 @@ namespace HomeAero
         public ApplicationDataContainer Settings { get; set; }
         public HomeAeroConfiguration HomeAero { get; set; }
         // Used for running the HomeAero
-        DispatcherTimer Timer; 
+        DispatcherTimer Timer;
+        private bool _isMisting;
         private DateTimeOffset _currentTime;
         private DateTimeOffset _sensorTime;
-        private DateTimeOffset _mistingStartTime;
+        public DateTimeOffset MistingStartTime;
         
 
         /// <summary>
@@ -43,6 +44,8 @@ namespace HomeAero
             this.Suspending += OnSuspending;
 
             HomeAero = new HomeAeroConfiguration();
+            MistingStartTime = DateTimeOffset.Now;
+            _isMisting = false;
 
             InitializeTimer();
         }
@@ -68,16 +71,18 @@ namespace HomeAero
 
                 if (mistInterval > 0 && mistDuration > 0)
                 {
-                    var durationSinceStart = _currentTime - _mistingStartTime;
-                    var nextStartTime = _mistingStartTime.AddSeconds(mistInterval + mistDuration);
+                    var durationSinceStart = _currentTime - MistingStartTime;
+                    var nextStartTime = MistingStartTime.AddSeconds(mistInterval + mistDuration);
 
-                    if (durationSinceStart.TotalSeconds > mistDuration)
+                    if (_isMisting && durationSinceStart.TotalSeconds > mistDuration)
                     {
                         HomeAero.EndMisting();
+                        _isMisting = false;
                     }
-                    else if (_currentTime > nextStartTime)
+                    else if (!_isMisting && _currentTime > nextStartTime)
                     {
-                        _mistingStartTime = DateTimeOffset.Now;
+                        MistingStartTime = DateTimeOffset.Now;
+                        _isMisting = true;
                         HomeAero.BeginMisting();
                     }
                 }

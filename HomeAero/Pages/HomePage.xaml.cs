@@ -27,6 +27,7 @@ namespace HomeAero.Pages
         ApplicationDataContainer Settings;
         HomeAeroConfiguration HomeAero;
         DispatcherTimer Timer; // Used for updating the time
+        DateTimeOffset LastMistTime;
         private DateTimeOffset _lastSensorUpdate;
 
         public HomePage()
@@ -36,6 +37,7 @@ namespace HomeAero.Pages
 
             Settings = (App.Current as App).Settings;
             HomeAero = (App.Current as App).HomeAero;
+            LastMistTime = (App.Current as App).MistingStartTime;
 
             var deviceName = Settings.Values["DeviceName"] != null
                 ? Settings.Values["DeviceName"].ToString()
@@ -70,11 +72,20 @@ namespace HomeAero.Pages
         private void UpdateSensorText()
         {
             var sensorReadings = HomeAero.GetSensorData();
+            var formattedPreviousMist = LastMistTime.ToString("h:mm tt");
+
+            double.TryParse(Settings.Values["MistInterval"].ToString(), out var mistInterval);
+            double.TryParse(Settings.Values["MistDuration"].ToString(), out var mistDuration);
+            var nextMist = mistInterval + mistDuration;
+
+            var formatttedNextMist = LastMistTime.Add(TimeSpan.FromSeconds(nextMist)).ToString("h:mm tt");
 
             RootTemp.Text = $"Root Temperature: {sensorReadings.RootTemperature}F";
             RootHumid.Text = $"Root Humidity: {sensorReadings.RootHumidity}%";
             PlantTemp.Text = $"Plant Temperature: {sensorReadings.PlantTemperature}F";
             PlantHumid.Text = $"Plant Humidity: {sensorReadings.PlantHumidity}%";
+            LastMisting.Text = $"Last Misting: {formattedPreviousMist}";
+            NextMisting.Text = $"Next Misting: {formatttedNextMist}";
         }
     }
 }
