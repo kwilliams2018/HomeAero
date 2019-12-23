@@ -45,11 +45,11 @@ namespace HomeAero.Config
 
                 _motorOnePin = _controller.OpenPin(MOTOR_ONE);
                 _motorOnePin.SetDriveMode(GpioPinDriveMode.Output);
-                _motorOnePin.Write(GpioPinValue.Low);
+                _motorOnePin.Write(GpioPinValue.High);
 
                 _motorTwoPin = _controller.OpenPin(MOTOR_TWO);
                 _motorTwoPin.SetDriveMode(GpioPinDriveMode.Output);
-                _motorTwoPin.Write(GpioPinValue.Low);
+                _motorTwoPin.Write(GpioPinValue.High);
             }
 
             _rootTemp = 0;
@@ -64,7 +64,7 @@ namespace HomeAero.Config
             {
                 try
                 {
-                    List<Task<(string, double, double)>> sensorReadings = new List<Task<(string, double, double)>>
+                    List<Task<(string, bool, double, double)>> sensorReadings = new List<Task<(string, bool, double, double)>>
                     {
                         ReadDht("root", _rootDht),
                         ReadDht("plant", _plantDht)
@@ -74,15 +74,18 @@ namespace HomeAero.Config
 
                     foreach (var reading in sensorReadings)
                     {
-                        if (reading.Result.Item1 == "root")
+                        if(reading.Result.Item2 == true)
                         {
-                            _rootTemp = reading.Result.Item2;
-                            _rootHumid = reading.Result.Item3;
-                        }
-                        else
-                        {
-                            _plantTemp = reading.Result.Item2;
-                            _plantHumid = reading.Result.Item3;
+                            if (reading.Result.Item1 == "root")
+                            {
+                                _rootTemp = reading.Result.Item3;
+                                _rootHumid = reading.Result.Item4;
+                            }
+                            else
+                            {
+                                _plantTemp = reading.Result.Item3;
+                                _plantHumid = reading.Result.Item4;
+                            }
                         }
                     }
                 }
@@ -117,8 +120,8 @@ namespace HomeAero.Config
         {
             if(_motorOnePin != null && _motorTwoPin != null)
             {
-                _motorOnePin.Write(GpioPinValue.High);
-                _motorTwoPin.Write(GpioPinValue.High);
+                _motorOnePin.Write(GpioPinValue.Low);
+                _motorTwoPin.Write(GpioPinValue.Low);
             }
         }
 
@@ -126,14 +129,14 @@ namespace HomeAero.Config
         {
             if(_motorOnePin != null && _motorTwoPin != null)
             {
-                _motorOnePin.Write(GpioPinValue.Low);
-                _motorTwoPin.Write(GpioPinValue.Low);
+                _motorOnePin.Write(GpioPinValue.High);
+                _motorTwoPin.Write(GpioPinValue.High);
             }
         }
 
-        private async Task<(string identifier, double temperature, double humidity)> ReadDht(string identifier, IDht device)
+        private async Task<(string identifier, bool valid, double temperature, double humidity)> ReadDht(string identifier, IDht device)
         {
-            (string identifier, double Temperature, double Humidity) result = (identifier, 0, 0);
+            (string identifier, bool valid, double Temperature, double Humidity) result = (identifier, false, 0, 0);
 
             DhtReading reading = new DhtReading();
             reading = await device.GetReadingAsync().AsTask();
@@ -144,6 +147,7 @@ namespace HomeAero.Config
                 var fahrenheit = (celcius * (9.0 / 5.0)) + 32;
                 result.Temperature = fahrenheit;
                 result.Humidity = reading.Humidity;
+                result.valid = true;
             }
 
             return result;
